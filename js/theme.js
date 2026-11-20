@@ -2,6 +2,7 @@
 // Самодостаточный: сам добавляет стили, кнопки и окно палитры, если их нет.
 (function () {
   const $ = id => document.getElementById(id);
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
 
   const CSS = `
 :root { --ctl-w: clamp(150px, 52vw, 200px); }
@@ -19,8 +20,8 @@ body[data-theme="yellow"] {
 .wheel {
   position: absolute; inset: 0; border-radius: 50%;
   background: conic-gradient(#f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
-  -webkit-mask: radial-gradient(closest-side, transparent 61%, #000 62%);
-  mask: radial-gradient(closest-side, transparent 61%, #000 62%);
+  -webkit-mask: radial-gradient(closest-side, transparent 66%, #000 67%);
+  mask: radial-gradient(closest-side, transparent 66%, #000 67%);
   touch-action: none; cursor: crosshair;
 }
 .wheel-knob {
@@ -29,7 +30,7 @@ body[data-theme="yellow"] {
   transform: translate(-50%, -50%); pointer-events: none;
 }
 .sv-box {
-  position: absolute; left: 22%; top: 22%; width: 56%; height: 56%;
+  position: absolute; left: 27%; top: 27%; width: 46%; height: 46%;
   border: 1px solid rgba(0,0,0,.35); touch-action: none; cursor: crosshair;
 }
 .sv-knob {
@@ -61,16 +62,18 @@ main::-webkit-scrollbar-thumb, .drawer-body::-webkit-scrollbar-thumb, .panel::-w
     load() { try { const r = localStorage.getItem(this.KEY); if (r) Object.assign(this.hsv, JSON.parse(r)); } catch (e) {} },
     save() { try { localStorage.setItem(this.KEY, JSON.stringify(this.hsv)); } catch (e) {} },
 
+    // Палитра из выбранного цвета: шапка ВСЕГДА темнее фона, как в готовых темах.
     vars() {
       const { h, s, v } = this.hsv;
-      const sat = Math.round(16 + s * 54);
+      const barL = clamp(Math.round(40 + v * 40), 52, 80); // шапка: 52–80% яркости
+      const barS = clamp(Math.round(10 + s * 75), 10, 85);
       return {
-        '--bar': `hsl(${h} ${sat}% ${Math.round(66 + v * 16)}%)`,
-        '--bg': `hsl(${h} 24% 97%)`,
-        '--card': `hsl(${h} 18% 99%)`,
-        '--ink': `hsl(${h} 14% 22%)`,
-        '--line': `hsl(${h} 12% 32%)`,
-        '--accent': `hsl(${h} ${Math.round(26 + s * 48)}% ${Math.round(44 + v * 16)}%)`,
+        '--bar':    `hsl(${h}, ${barS}%, ${barL}%)`,                          // шапка/панели — темнее
+        '--bg':     `hsl(${h}, ${Math.round(Math.min(26, s * 30))}%, 96%)`,   // экран — светлый
+        '--card':   `hsl(${h}, ${Math.round(Math.min(18, s * 22))}%, 99%)`,   // карточки — ещё светлее
+        '--ink':    `hsl(${h}, 14%, 20%)`,
+        '--line':   `hsl(${h}, 12%, 30%)`,
+        '--accent': `hsl(${h}, ${clamp(Math.round(20 + s * 65), 35, 85)}%, ${clamp(barL - 16, 30, 50)}%)`,
         '--danger': '#c0392b'
       };
     },
@@ -118,7 +121,7 @@ main::-webkit-scrollbar-thumb, .drawer-body::-webkit-scrollbar-thumb, .panel::-w
       if (!size) return;
       const { h, s, v } = this.hsv;
       const rad = (h - 90) * Math.PI / 180;
-      const r = size * 0.41;
+      const r = size * 0.415;
       const knob = $('wheelKnob');
       knob.style.left = (size / 2 + r * Math.cos(rad)) + 'px';
       knob.style.top = (size / 2 + r * Math.sin(rad)) + 'px';
@@ -142,8 +145,8 @@ main::-webkit-scrollbar-thumb, .drawer-body::-webkit-scrollbar-thumb, .panel::-w
     },
     setFromBox(e) {
       const b = $('svBox').getBoundingClientRect();
-      this.hsv.s = Math.min(1, Math.max(0, (e.clientX - b.left) / b.width));
-      this.hsv.v = Math.min(1, Math.max(0, 1 - (e.clientY - b.top) / b.height));
+      this.hsv.s = clamp((e.clientX - b.left) / b.width, 0, 1);
+      this.hsv.v = clamp(1 - (e.clientY - b.top) / b.height, 0, 1);
       this.live();
     },
     live() {
@@ -191,7 +194,13 @@ main::-webkit-scrollbar-thumb, .drawer-body::-webkit-scrollbar-thumb, .panel::-w
   }
 
   function ensurePicker() {
-    if ($('pickerOverlay')) return;
+    const ov = $('pickerOverlay');
+    if (ov) {
+      // Палитра обязана лежать прямо в <body>. Если она вложена в другое
+      // (скрытое) окно — например, в календарь — она никогда не покажется.
+      if (ov.parentElement !== document.body) document.body.appendChild(ov);
+      return;
+    }
     const wrap = document.createElement('div');
     wrap.innerHTML =
       '<div id="pickerOverlay" class="overlay hidden">' +
@@ -266,8 +275,7 @@ main::-webkit-scrollbar-thumb, .drawer-body::-webkit-scrollbar-thumb, .panel::-w
     if (o && !o.classList.contains('hidden')) Theme.renderPicker();
   });
 
-  // «Оформление»: ставим РОВНО один обработчик после загрузки app.js,
-  // чтобы список не открывался и не закрывался одновременно двумя обработчиками.
+  // «Оформление»: ровно один обработчик после загрузки app.js.
   window.addEventListener('load', () => {
     const ap = $('appearanceBtn');
     if (!ap) return;
