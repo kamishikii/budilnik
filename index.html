@@ -17,9 +17,6 @@
   <!-- список будильников -->
   <main id="listWrap">
     <div id="alarmList"></div>
-    <div id="emptyHint" class="empty-hint hidden">
-      Пока пусто 🌿<br>Нажми <b>+</b> внизу, чтобы добавить будильник
-    </div>
   </main>
 
   <!-- строка массового добавления (фото 3) -->
@@ -43,13 +40,15 @@
     </div>
     <div class="drawer-body">
       <button id="appearanceBtn" class="drawer-row">Оформление</button>
-      <div id="themeList" class="theme-list hidden">
+            <div id="themeList" class="theme-list hidden">
         <button class="theme-btn" data-theme-id="sage"><span class="dot" style="background:#a9c2b3"></span>Шалфей</button>
+        <button class="theme-btn" data-theme-id="yellow"><span class="dot" style="background:#ecd98f"></span>Жёлтая</button>
         <button class="theme-btn" data-theme-id="dark"><span class="dot" style="background:#2e3a34"></span>Тёмная</button>
         <button class="theme-btn" data-theme-id="light"><span class="dot" style="background:#e9e9e9"></span>Светлая</button>
         <button class="theme-btn" data-theme-id="rose"><span class="dot" style="background:#e7bfc7"></span>Розовая</button>
         <button class="theme-btn" data-theme-id="sky"><span class="dot" style="background:#b9cfe4"></span>Небесная</button>
-      </div>
+        <button class="theme-btn" id="customColorBtn" data-theme-id="custom"><span class="dot" id="customDot"></span>Свой цвет</button>
+            </div>
     </div>
     <div class="drawer-bottom"></div>
   </aside>
@@ -114,6 +113,28 @@
         <button id="calMonthNext" class="cal-arrow" title="Месяц вперёд">›</button>
         <button id="calYearNext" class="cal-arrow" title="Год вперёд">»</button>
       </div>
+        <!-- палитра своего цвета -->
+  <div id="pickerOverlay" class="overlay hidden">
+    <div class="panel">
+      <div class="panel-bar">Свой цвет</div>
+      <div class="picker-body">
+        <div class="picker-stage" id="pickerStage">
+          <div class="wheel" id="wheel"></div>
+          <div class="wheel-knob" id="wheelKnob"></div>
+          <div class="sv-box" id="svBox"><div class="sv-knob" id="svKnob"></div></div>
+        </div>
+        <div class="picker-preview">
+          <span class="picker-swatch" id="pickerSwatch"></span>
+          <span class="picker-hex" id="pickerHex">#A9C2B3</span>
+        </div>
+        <div class="editor-actions">
+          <button id="pickerReset" class="text-btn">Сброс</button>
+          <button id="pickerClose" class="icon-btn" data-icon="close" data-fallback="✕" title="Отменить"></button>
+          <button id="pickerDone" class="icon-btn" data-icon="check" data-fallback="✓" title="Оставить"></button>
+        </div>
+      </div>
+    </div>
+  </div>
       <div class="cal-weekdays">
         <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
       </div>
@@ -145,6 +166,7 @@
   <script src="js/schedule.js"></script>
   <script src="js/player.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/theme.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
