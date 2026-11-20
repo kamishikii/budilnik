@@ -17,8 +17,14 @@
   $('batchInput').addEventListener('keydown', e => { if (e.key === 'Enter') UI.batchConfirm(); });
 
   // --- меню ---
-  $('menuBtn').onclick = () => UI.openDrawer();
+  function toggleDrawer() {
+    if ($('drawer').classList.contains('open')) UI.closeDrawer();
+    else { UI.hideRepeatMenu(); UI.openDrawer(); }
+  }
+  $('menuBtn').onclick = toggleDrawer;
+  $('drawerMenuBtn').onclick = () => UI.closeDrawer();
   $('drawerOverlay').onclick = () => UI.closeDrawer();
+  $('appearanceBtn').onclick = () => $('themeList').classList.toggle('hidden');
   $('themeList').addEventListener('click', e => {
     const b = e.target.closest('.theme-btn');
     if (b) UI.applyTheme(b.dataset.themeId);
