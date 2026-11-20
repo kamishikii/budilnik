@@ -20,7 +20,6 @@ const UI = {
   renderList() {
     const arr = [...Store.alarms].sort((a, b) => a.time.localeCompare(b.time));
     this.$('alarmList').innerHTML = arr.map(a => this.cardHTML(a)).join('');
-    this.$('emptyHint').classList.toggle('hidden', arr.length > 0);
   },
   cardHTML(a) {
     const custom = a.schedule && a.schedule.type === 'custom';
@@ -245,8 +244,11 @@ const UI = {
     this.$('drawer').classList.remove('open');
     this.$('drawerOverlay').classList.add('hidden');
   },
+
   applyTheme(id) {
+    if (window.Theme) Theme.clearCustom();
     document.body.dataset.theme = id;
+    if (id === 'custom' && window.Theme) Theme.applyCustom();
     Store.setTheme(id);
     document.querySelectorAll('.theme-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.themeId === id));
