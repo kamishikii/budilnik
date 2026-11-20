@@ -257,8 +257,6 @@ main::-webkit-scrollbar-thumb, .drawer-body::-webkit-scrollbar-thumb, .panel::-w
 
   const cc = $('customColorBtn');
   if (cc) cc.addEventListener('click', () => Theme.openPicker());
-  const ap = $('appearanceBtn');
-  if (ap && !ap.onclick) ap.addEventListener('click', () => $('themeList').classList.toggle('hidden'));
   const done = $('pickerDone'), cls = $('pickerClose'), rst = $('pickerReset');
   if (done) done.addEventListener('click', () => Theme.closePicker(true));
   if (cls) cls.addEventListener('click', () => Theme.closePicker(false));
@@ -266,6 +264,19 @@ main::-webkit-scrollbar-thumb, .drawer-body::-webkit-scrollbar-thumb, .panel::-w
   window.addEventListener('resize', () => {
     const o = $('pickerOverlay');
     if (o && !o.classList.contains('hidden')) Theme.renderPicker();
+  });
+
+  // «Оформление»: ставим РОВНО один обработчик после загрузки app.js,
+  // чтобы список не открывался и не закрывался одновременно двумя обработчиками.
+  window.addEventListener('load', () => {
+    const ap = $('appearanceBtn');
+    if (!ap) return;
+    const fresh = ap.cloneNode(true);
+    ap.parentNode.replaceChild(fresh, ap);
+    fresh.onclick = () => {
+      const list = $('themeList');
+      if (list) list.classList.toggle('hidden');
+    };
   });
 
   Theme.load();
