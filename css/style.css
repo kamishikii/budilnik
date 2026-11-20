@@ -235,3 +235,35 @@ body[data-theme="dark"] .ico img { filter:invert(.85); }
   background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:20px;
   font-size:14px; z-index:120; max-width:90vw; text-align:center;
 }
+/* ===== меню как на фото: половина экрана, поверх плашек ===== */
+.drawer-overlay { position:fixed; inset:0; z-index:70; background:transparent; }
+.drawer {
+  position:fixed; top:0; right:0; bottom:0; z-index:75;
+  width:50%; min-width:200px; max-width:340px;
+  display:flex; flex-direction:column;
+  background:var(--card); border-left:2px solid var(--line);
+  transform:translateX(105%); transition:transform .25s;
+  padding:0; overflow:hidden;
+}
+.drawer.open { transform:none; }
+.drawer-top {
+  flex:none; height:60px; background:var(--bar);
+  border-bottom:2px solid var(--line);
+  display:flex; align-items:center; padding:0 8px;
+}
+.drawer-body { flex:1; overflow-y:auto; background:var(--card); }
+.drawer-row {
+  display:block; width:100%; text-align:left;
+  background:none; border:none; border-bottom:2px solid var(--line);
+  padding:14px 16px; font-size:19px; letter-spacing:1px;
+  text-transform:uppercase; color:var(--ink); cursor:pointer;
+}
+.drawer-bottom {
+  flex:none; height:calc(76px + env(safe-area-inset-bottom));
+  background:var(--bar); border-top:2px solid var(--line);
+}
+.theme-list .theme-btn {
+  border:none; border-bottom:1px solid var(--line);
+  border-radius:0; padding:12px 16px; font-size:16px;
+}
+.theme-list .theme-btn.active { background:var(--bar); font-weight:600; }
