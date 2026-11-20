@@ -5,6 +5,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,6 +45,39 @@ jobs:
           cp native/*.java "$PKG"/
           cp native/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
           sed -i 's/targetSdkVersion = .*/targetSdkVersion = 33/' android/variables.gradle
+
+      - name: Stable signing key
+        run: |
+          mkdir -p signing
+          if [ ! -f signing/dindin.jks ]; then
+            keytool -genkeypair -v -keystore signing/dindin.jks -alias dindin \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass dindin123 -keypass dindin123 \
+              -dname "CN=dindin, O=kamishikii, C=RU"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add signing/dindin.jks
+            git commit -m "add signing key"
+            git push origin HEAD
+          fi
+          cat >> android/app/build.gradle <<'EOF'
+
+          android {
+              signingConfigs {
+                  dindin {
+                      storeFile file("../../signing/dindin.jks")
+                      storePassword "dindin123"
+                      keyAlias "dindin"
+                      keyPassword "dindin123"
+                  }
+              }
+              buildTypes {
+                  debug { signingConfig signingConfigs.dindin }
+                  release { signingConfig signingConfigs.dindin; minifyEnabled false }
+              }
+          }
+          EOF
+          sed -i "s/versionCode .*/versionCode ${{ github.run_number }}/" android/app/build.gradle
 
       - name: App icon
         run: |
