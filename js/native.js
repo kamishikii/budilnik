@@ -53,7 +53,7 @@ const Native = {
     if (!this.available || !file) return Promise.resolve();
     return this._sendMelody(id, file).then(() => this._markPushed(id));
   },
-  // мелодии, добавленные до нативного слоя, докопируем в память телефона
+  
   async pushMelodies() {
     if (!this.available) return;
     const done = this._pushed();
@@ -82,20 +82,20 @@ const Native = {
 };
 window.Native = Native;
 
-// ===== подключение к приложению =====
+
 (function () {
-  // любое изменение будильников сразу улетает в систему
+  
   const origSave = Store.saveAlarms.bind(Store);
   Store.saveAlarms = function () { origSave(); Native.sync(); };
 
-  // новая мелодия сразу копируется в память телефона
+  
   const origMel = Store.saveMelody.bind(Store);
   Store.saveMelody = async function (id, name, file) {
     await origMel(id, name, file);
     try { await Native.saveMelody(id, file); } catch (e) {}
   };
 
-  // в APK звонит нативный слой (даже с выключенным экраном) — веб-звонок не дублируем
+  
   const origRing = Player.ring.bind(Player);
   Player.ring = function (a) { if (Native.available) return; return origRing(a); };
 
@@ -112,7 +112,7 @@ window.Native = Native;
     origSnooze(min);
   };
 
-  // смахивание вверх по экрану звонка + подсказка
+  
   const st = document.createElement('style');
   st.textContent = '.ring-hint { margin-top: 22px; font-size: 15px; opacity: .55; }';
   document.head.appendChild(st);
