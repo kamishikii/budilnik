@@ -62,7 +62,7 @@ public class AlarmScheduler {
             boolean exactOk = Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms();
             if (Build.VERSION.SDK_INT >= 23 && exactOk) {
                 if (!snooze) {
-                    // setAlarmClock — режим настоящего будильника: система будит даже в глубоком сне
+                    
                     Intent show = new Intent(c, MainActivity.class);
                     PendingIntent showPi = PendingIntent.getActivity(c, req(id) ^ 0x5555, show, piFlags());
                     am.setAlarmClock(new AlarmManager.AlarmClockInfo(time, showPi), p);
@@ -79,7 +79,7 @@ public class AlarmScheduler {
         }
     }
 
-    // перерегистрировать всё (вызывается при синхронизации, после перезагрузки, после обновления)
+    
     public static void rescheduleAll(Context c) {
         JSONArray arr = alarms(c);
         long now = System.currentTimeMillis();
@@ -100,14 +100,14 @@ public class AlarmScheduler {
             long t = nextTrigger(a, now);
             if (t > 0) schedule(c, id, t, false);
         }
-        // будильники, которых больше нет в списке
+        
         for (String id : old) {
             if (!current.contains(id)) { cancel(c, id); sp.edit().remove("snooze." + id).apply(); }
         }
         sp.edit().putStringSet("scheduled", current).apply();
     }
 
-    // после звонка: запланировать следующий раз (или выключить «однократно»)
+    
     public static void afterFire(Context c, String id, boolean snooze) {
         SharedPreferences sp = prefs(c);
         if (snooze) sp.edit().remove("snooze." + id).apply();
@@ -139,7 +139,7 @@ public class AlarmScheduler {
         schedule(c, id, t, true);
     }
 
-    // ближайшее срабатывание после момента from
+    
     static long nextTrigger(JSONObject a, long from) {
         try {
             String[] hm = a.optString("time", "00:00").split(":");
