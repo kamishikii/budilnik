@@ -1,5 +1,4 @@
-// Экран звонка: чёрный фон, пульсирующее свечение по краям, дрейфующие светлячки.
-// Смахивание вверх (кроме кнопки «Отложить») выключает; тап по кнопке — откладывает.
+
 (function () {
   const $ = id => document.getElementById(id);
   const overlay = $('ringOverlay');
@@ -45,13 +44,14 @@
   arrow.textContent = '↑';
   overlay.insertBefore(arrow, overlay.querySelector('.ring-actions'));
   $('ringSnooze').innerHTML = 'Отложить<br><small>на 5 мин</small>';
+  
 
-  // ===== светлячки и свечение =====
+  
   let W = 0, H = 0, raf = 0, t0 = 0, sh = null;
   let seed = 7;
   const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
   const P = [];
-  for (let i = 0; i < 170; i++) {
+  for (let i = 0; i < 260; i++) {
     const p = { center: false };
     const z = rnd();
     if (z < 0.62) {
@@ -111,6 +111,24 @@
   };
   window.addEventListener('resize', () => { if (raf) resize(); });
 
+  
+  let enteredFs = false;
+  function tryFs() {
+    try {
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().then(() => { enteredFs = true; }).catch(() => {});
+      }
+    } catch (e) {}
+  }
+  function exitFs() {
+    try {
+      if (enteredFs && document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    } catch (e) {}
+    enteredFs = false;
+  }
+
   const origShow = UI.showRing.bind(UI);
   UI.showRing = function (a) {
     origShow(a);
@@ -118,11 +136,12 @@
     dateEl.textContent = p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear();
     $('ringNote').style.display = (a && a.note) ? '' : 'none';
     fx.start();
+    tryFs();
   };
   const origHide = UI.hideRing.bind(UI);
-  UI.hideRing = function () { origHide(); fx.stop(); };
+  UI.hideRing = function () { origHide(); fx.stop(); exitFs(); };
 
-  // ===== жесты =====
+  
   let sy = null, sx = 0, onBtn = false;
   overlay.addEventListener('pointerdown', e => {
     sy = e.clientY; sx = e.clientX;
