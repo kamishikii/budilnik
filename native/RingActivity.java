@@ -162,7 +162,6 @@ public class RingActivity extends Activity {
         h.postDelayed(check, 500);
     }
 
-    // ===== полностью убираем строку состояния и навигацию на время звонка =====
     private void hideSystemBars() {
         if (Build.VERSION.SDK_INT >= 30) {
             getWindow().setDecorFitsSystemWindows(false);
@@ -192,7 +191,6 @@ public class RingActivity extends Activity {
         hideSystemBars();
     }
 
-    // смахивание вверх в любом месте, КРОМЕ кнопки «Отложить», выключает будильник
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch (ev.getActionMasked()) {
@@ -226,7 +224,7 @@ public class RingActivity extends Activity {
 
     private int dp(int v) { return Math.round(getResources().getDisplayMetrics().density * v); }
 
-    @Override public void onBackPressed() { /* случайно не закрываем */ }
+    @Override public void onBackPressed() { }
 
     @Override protected void onDestroy() {
         if (bob != null) bob.cancel();
@@ -234,7 +232,6 @@ public class RingActivity extends Activity {
         super.onDestroy();
     }
 
-    // ===== чёрный фон: пульсирующее свечение по краям + дрейфующие светлячки =====
     private static class Fly {
         float fx, fy, r, a, sp, sp2, tw, ph, ph2, ph3;
         boolean center;
@@ -244,7 +241,7 @@ public class RingActivity extends Activity {
         private final Paint glow = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint dot = new Paint(Paint.ANTI_ALIAS_FLAG);
         private Shader left, right, top, bottom;
-        private final Fly[] flies = new Fly[260];
+        private final Fly[] flies = new Fly[340];
         private boolean running = false;
         private long t0 = SystemClock.uptimeMillis();
         private int w, hh;
@@ -256,18 +253,18 @@ public class RingActivity extends Activity {
             for (int i = 0; i < flies.length; i++) {
                 Fly f = new Fly();
                 float z = rnd.nextFloat();
-                if (z < 0.62f) {           // плотные боковые полосы
-                    f.fx = rnd.nextFloat() < 0.5f ? rnd.nextFloat() * 0.20f : 0.80f + rnd.nextFloat() * 0.20f;
+                if (z < 0.62f) {
+                    f.fx = rnd.nextFloat() < 0.5f ? rnd.nextFloat() * 0.16f : 0.84f + rnd.nextFloat() * 0.16f;
                     f.fy = rnd.nextFloat();
-                } else if (z < 0.82f) {    // верх и низ
+                } else if (z < 0.82f) {
                     f.fx = rnd.nextFloat();
-                    f.fy = rnd.nextFloat() < 0.5f ? rnd.nextFloat() * 0.16f : 0.84f + rnd.nextFloat() * 0.16f;
-                } else {                   // редкие точки в центре
-                    f.fx = 0.2f + rnd.nextFloat() * 0.6f;
-                    f.fy = 0.2f + rnd.nextFloat() * 0.6f;
+                    f.fy = rnd.nextFloat() < 0.5f ? rnd.nextFloat() * 0.12f : 0.88f + rnd.nextFloat() * 0.12f;
+                } else {
+                    f.fx = 0.16f + rnd.nextFloat() * 0.68f;
+                    f.fy = 0.12f + rnd.nextFloat() * 0.76f;
                     f.center = true;
                 }
-                f.r = 0.6f + rnd.nextFloat() * 1.6f;
+                f.r = 0.4f + rnd.nextFloat() * 1.1f;
                 f.a = 0.25f + rnd.nextFloat() * 0.75f;
                 f.sp = 0.25f + rnd.nextFloat() * 0.5f;
                 f.sp2 = 0.2f + rnd.nextFloat() * 0.45f;
@@ -282,10 +279,10 @@ public class RingActivity extends Activity {
         @Override protected void onSizeChanged(int nw, int nh, int ow, int oh) {
             w = nw; hh = nh;
             int col = 0xFFB9C2D8;
-            left = new LinearGradient(0, 0, w * 0.30f, 0, col, col & 0x00FFFFFF, Shader.TileMode.CLAMP);
-            right = new LinearGradient(w, 0, w * 0.70f, 0, col, col & 0x00FFFFFF, Shader.TileMode.CLAMP);
-            top = new LinearGradient(0, 0, 0, hh * 0.22f, col, col & 0x00FFFFFF, Shader.TileMode.CLAMP);
-            bottom = new LinearGradient(0, hh, 0, hh * 0.78f, col, col & 0x00FFFFFF, Shader.TileMode.CLAMP);
+            left = new LinearGradient(0, 0, w * 0.16f, 0, col, col & 0x00FFFFFF, Shader.TileMode.CLAMP);
+            right = new LinearGradient(w, 0, w * 0.84f, 0, col, col & 0x00FFFFFF, Shader.TileMode.CLAMP);
+            top = new LinearGradient(0, 0, 0, hh * 0.12f, col, col & 0x00FFFFFF, Shader.TileMode.CLAMP);
+            bottom = new LinearGradient(0, hh, 0, hh * 0.88f, col, col & 0x00FFFFFF, Shader.TileMode.CLAMP);
         }
 
         @Override protected void onAttachedToWindow() {
@@ -307,17 +304,17 @@ public class RingActivity extends Activity {
             c.drawColor(0xFF000000);
 
             float pulse = 0.72f + 0.16f * (float) Math.sin(t * 0.7) + 0.12f * (float) Math.sin(t * 1.31 + 1.7);
-            glow.setAlpha(Math.max(0, Math.min(255, Math.round(200 * pulse))));
-            glow.setShader(left);   c.drawRect(0, 0, w * 0.30f, hh, glow);
-            glow.setShader(right);  c.drawRect(w * 0.70f, 0, w, hh, glow);
-            glow.setShader(top);    c.drawRect(0, 0, w, hh * 0.22f, glow);
-            glow.setShader(bottom); c.drawRect(0, hh * 0.78f, w, hh, glow);
+            glow.setAlpha(Math.max(0, Math.min(255, Math.round(170 * pulse))));
+            glow.setShader(left);   c.drawRect(0, 0, w * 0.16f, hh, glow);
+            glow.setShader(right);  c.drawRect(w * 0.84f, 0, w, hh, glow);
+            glow.setShader(top);    c.drawRect(0, 0, w, hh * 0.12f, glow);
+            glow.setShader(bottom); c.drawRect(0, hh * 0.88f, w, hh, glow);
             glow.setShader(null);
 
             float d = getResources().getDisplayMetrics().density;
             for (Fly f : flies) {
-                float x = f.fx * w + (float) Math.sin(t * f.sp + f.ph) * 6 * d;
-                float y = f.fy * hh + (float) Math.cos(t * f.sp2 + f.ph2) * 5 * d;
+                float x = f.fx * w + (float) Math.sin(t * f.sp + f.ph) * 4 * d;
+                float y = f.fy * hh + (float) Math.cos(t * f.sp2 + f.ph2) * 3.5f * d;
                 float tw = 0.3f + 0.7f * (0.5f + 0.5f * (float) Math.sin(t * f.tw + f.ph3));
                 dot.setAlpha(Math.max(0, Math.min(255, Math.round(255 * f.a * tw * (f.center ? 0.45f : 1f)))));
                 c.drawCircle(x, y, f.r * d, dot);
