@@ -13,7 +13,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(AlarmClockPlugin.class);
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // Android 13+ спрашивает разрешение на уведомления
+        
         if (Build.VERSION.SDK_INT >= 33) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
