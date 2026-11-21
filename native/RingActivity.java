@@ -19,6 +19,8 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -156,7 +158,38 @@ public class RingActivity extends Activity {
         root.addView(col, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(root);
+        hideSystemBars();
         h.postDelayed(check, 500);
+    }
+
+    // ===== полностью убираем строку состояния и навигацию на время звонка =====
+    private void hideSystemBars() {
+        if (Build.VERSION.SDK_INT >= 30) {
+            getWindow().setDecorFitsSystemWindows(false);
+            WindowInsetsController ic = getWindow().getInsetsController();
+            if (ic != null) {
+                ic.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                ic.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
+    }
+
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) hideSystemBars();
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        hideSystemBars();
     }
 
     // смахивание вверх в любом месте, КРОМЕ кнопки «Отложить», выключает будильник
@@ -211,7 +244,7 @@ public class RingActivity extends Activity {
         private final Paint glow = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint dot = new Paint(Paint.ANTI_ALIAS_FLAG);
         private Shader left, right, top, bottom;
-        private final Fly[] flies = new Fly[170];
+        private final Fly[] flies = new Fly[260];
         private boolean running = false;
         private long t0 = SystemClock.uptimeMillis();
         private int w, hh;
@@ -292,4 +325,4 @@ public class RingActivity extends Activity {
             if (running) postInvalidateOnAnimation();
         }
     }
-                        }
+}
