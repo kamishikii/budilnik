@@ -1,4 +1,4 @@
-// Вся логика графиков повтора.
+
 const Schedule = {
   TYPES: [
     { id: 'once',     label: 'Однократно' },
@@ -25,11 +25,11 @@ const Schedule = {
     return t ? t.label : 'Однократно';
   },
   pad(n) { return String(n).padStart(2, '0'); },
-  // ключ даты вида 2026-07-05 (локальная дата, без часовых поясов)
+  
   key(d) { return d.getFullYear() + '-' + this.pad(d.getMonth() + 1) + '-' + this.pad(d.getDate()); },
   human(keyStr) { const [y, m, d] = keyStr.split('-'); return `${d}.${m}.${y}`; },
 
-  // должен ли будильник сработать в этот день
+  
   isActive(sch, date) {
     const t = (sch && sch.type) || 'once';
     if (t === 'once' || t === 'daily') return true;
@@ -39,7 +39,7 @@ const Schedule = {
 
     const def = this.byId(t);
     if (!def || !def.work) return true;
-    // сменный график: считаем дни от первого рабочего дня
+    
     const anchorStr = sch.anchor || this.key(new Date());
     const [ay, am, ad] = anchorStr.split('-').map(Number);
     const a = new Date(ay, am - 1, ad);
