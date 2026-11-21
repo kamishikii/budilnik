@@ -1,10 +1,10 @@
-// Хранилище: будильники — в localStorage, мелодии (аудиофайлы) — в IndexedDB.
+
 const Store = {
   ALARMS_KEY: 'kukusiki.alarms.v1',
   THEME_KEY: 'kukusiki.theme',
   alarms: [],
   db: null,
-  memMelodies: {}, // запасной вариант, если IndexedDB недоступен
+  memMelodies: {}, 
 
   loadAlarms() {
     try {
@@ -30,7 +30,7 @@ const Store = {
   },
   newId() { return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); },
 
-  // ----- мелодии -----
+  
   openDB() {
     return new Promise((res, rej) => {
       if (!window.indexedDB) return rej(new Error('no idb'));
@@ -59,7 +59,7 @@ const Store = {
       rq.onerror = () => res(this.memMelodies[id] || null);
     });
   },
-  // удаляет мелодии, на которые больше никто не ссылается
+  
   cleanupMelodies() {
     if (!this.db) return;
     const used = new Set(this.alarms.map(a => a.melodyId).filter(Boolean));
@@ -69,7 +69,7 @@ const Store = {
     rq.onsuccess = () => rq.result.forEach(k => { if (!used.has(k)) st.delete(k); });
   },
 
-  // ----- тема -----
+  
   getTheme() { try { return localStorage.getItem(this.THEME_KEY); } catch (e) { return null; } },
   setTheme(id) { try { localStorage.setItem(this.THEME_KEY, id); } catch (e) {} }
 };
