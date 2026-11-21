@@ -1,5 +1,4 @@
-// Палитра «свой цвет»: колесо оттенка + квадрат насыщенности/яркости.
-// Самодостаточный: сам добавляет стили, кнопки и окно палитры, если их нет.
+
 (function () {
   const $ = id => document.getElementById(id);
   const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -62,15 +61,15 @@ main::-webkit-scrollbar-thumb, .drawer-body::-webkit-scrollbar-thumb, .panel::-w
     load() { try { const r = localStorage.getItem(this.KEY); if (r) Object.assign(this.hsv, JSON.parse(r)); } catch (e) {} },
     save() { try { localStorage.setItem(this.KEY, JSON.stringify(this.hsv)); } catch (e) {} },
 
-    // Палитра из выбранного цвета: шапка ВСЕГДА темнее фона, как в готовых темах.
+    
     vars() {
       const { h, s, v } = this.hsv;
-      const barL = clamp(Math.round(40 + v * 40), 52, 80); // шапка: 52–80% яркости
+      const barL = clamp(Math.round(40 + v * 40), 52, 80); 
       const barS = clamp(Math.round(10 + s * 75), 10, 85);
       return {
-        '--bar':    `hsl(${h}, ${barS}%, ${barL}%)`,                          // шапка/панели — темнее
-        '--bg':     `hsl(${h}, ${Math.round(Math.min(26, s * 30))}%, 96%)`,   // экран — светлый
-        '--card':   `hsl(${h}, ${Math.round(Math.min(18, s * 22))}%, 99%)`,   // карточки — ещё светлее
+        '--bar':    `hsl(${h}, ${barS}%, ${barL}%)`,                          
+        '--bg':     `hsl(${h}, ${Math.round(Math.min(26, s * 30))}%, 96%)`,   
+        '--card':   `hsl(${h}, ${Math.round(Math.min(18, s * 22))}%, 99%)`,   
         '--ink':    `hsl(${h}, 14%, 20%)`,
         '--line':   `hsl(${h}, 12%, 30%)`,
         '--accent': `hsl(${h}, ${clamp(Math.round(20 + s * 65), 35, 85)}%, ${clamp(barL - 16, 30, 50)}%)`,
@@ -196,8 +195,7 @@ main::-webkit-scrollbar-thumb, .drawer-body::-webkit-scrollbar-thumb, .panel::-w
   function ensurePicker() {
     const ov = $('pickerOverlay');
     if (ov) {
-      // Палитра обязана лежать прямо в <body>. Если она вложена в другое
-      // (скрытое) окно — например, в календарь — она никогда не покажется.
+      
       if (ov.parentElement !== document.body) document.body.appendChild(ov);
       return;
     }
