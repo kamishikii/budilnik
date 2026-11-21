@@ -1,9 +1,9 @@
-// Звук, вибрация, очередь звонков, откладывание.
+
 const Player = {
   ctx: null, audio: null, beepTimer: null, vibTimer: null,
   current: null, queue: [], urls: {}, previewAudio: null,
 
-  // браузер разрешает звук только после касания экрана — вызываем при первом тапе
+  
   unlock() {
     if (!this.ctx) {
       try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
@@ -12,7 +12,7 @@ const Player = {
   },
 
   async ring(alarm) {
-    if (this.current) { // уже звонит другой — ставим в очередь
+    if (this.current) { 
       if (!this.queue.find(a => a.id === alarm.id)) this.queue.push(alarm);
       return;
     }
@@ -23,7 +23,7 @@ const Player = {
     let played = false;
     if (alarm.melodyId) {
       const m = await Store.getMelody(alarm.melodyId);
-      if (this.current !== alarm) return; // успели выключить, пока грузили
+      if (this.current !== alarm) return; 
       if (m && m.blob) {
         try {
           const url = this.urls[m.id] || (this.urls[m.id] = URL.createObjectURL(m.blob));
@@ -34,7 +34,7 @@ const Player = {
         } catch (e) {}
       }
     }
-    if (!played) this.startBeep(); // мелодии нет или не запустилась — пищалка
+    if (!played) this.startBeep(); 
   },
 
   startBeep() {
@@ -78,7 +78,7 @@ const Player = {
     if (next) this.ring(next);
   },
 
-  // кнопка «Выключить»
+  
   dismiss() {
     const a = this.current;
     if (a && a.schedule && a.schedule.type === 'once') Store.update(a.id, { enabled: false });
@@ -86,7 +86,7 @@ const Player = {
     UI.renderList();
   },
 
-  // кнопка «Отложить»
+  
   snooze(min) {
     if (this.current) {
       Store.update(this.current.id, { snoozeUntil: Date.now() + min * 60000, enabled: true });
@@ -96,7 +96,7 @@ const Player = {
     UI.toast('Отложено на ' + min + ' мин');
   },
 
-  // прослушивание мелодии в редакторе
+  
   async previewToggle(melodyId) {
     if (this.previewAudio) { this.stopPreview(); return false; }
     const m = await Store.getMelody(melodyId);
