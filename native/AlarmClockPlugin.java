@@ -24,7 +24,7 @@ import java.util.Set;
 @CapacitorPlugin(name = "AlarmClock")
 public class AlarmClockPlugin extends Plugin {
 
-    // сайт присылает весь список будильников — система перерегистрирует расписание
+    
     @PluginMethod
     public void sync(PluginCall call) {
         String json = call.getString("alarms", "[]");
@@ -33,7 +33,7 @@ public class AlarmClockPlugin extends Plugin {
         sp.edit().putString("list", json).putString("autoDisabled", "").apply();
         AlarmScheduler.rescheduleAll(getContext());
 
-        // удаляем мелодии, на которые больше никто не ссылается
+        
         Set<String> keep = new HashSet<>(Arrays.asList(used.split(",")));
         File dir = new File(getContext().getFilesDir(), "melodies");
         File[] files = dir.listFiles();
@@ -47,7 +47,7 @@ public class AlarmClockPlugin extends Plugin {
         call.resolve();
     }
 
-    // какие «однократно» система уже выключила сама (сайт применит это у себя)
+    
     @PluginMethod
     public void getState(PluginCall call) {
         String dis = AlarmScheduler.prefs(getContext()).getString("autoDisabled", "");
@@ -58,7 +58,7 @@ public class AlarmClockPlugin extends Plugin {
         call.resolve(o);
     }
 
-    // копия мелодии во внутреннюю память — чтобы звонила даже после перезагрузки
+    
     @PluginMethod
     public void saveMelody(PluginCall call) {
         String id = call.getString("id");
@@ -87,7 +87,7 @@ public class AlarmClockPlugin extends Plugin {
         call.resolve();
     }
 
-    // просим не усыплять приложение (важно для китайских телефонов)
+    
     @PluginMethod
     public void askBattery(PluginCall call) {
         try {
