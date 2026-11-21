@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -23,6 +24,7 @@ public class RingActivity extends Activity {
             h.postDelayed(this, 500);
         }
     };
+    private float downX = 0, downY = -1;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -93,8 +95,41 @@ public class RingActivity extends Activity {
         row.addView(stop);
 
         root.addView(row);
+
+        TextView hint = new TextView(this);
+        hint.setText("↑  смахни вверх, чтобы выключить");
+        hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        hint.setTextColor(0xFF8A8A8A);
+        hint.setGravity(Gravity.CENTER);
+        hint.setPadding(0, dp(28), 0, 0);
+        root.addView(hint);
+
         setContentView(root);
         h.postDelayed(check, 500);
+    }
+
+    // смахивание вверх в любом месте экрана выключает будильник
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        switch (ev.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                downX = ev.getX(); downY = ev.getY();
+                break;
+            case MotionEvent.ACTION_UP:
+                float dy = downY - ev.getY();
+                if (downY >= 0 && dy > dp(90) && Math.abs(ev.getX() - downX) < dy) {
+                    downY = -1;
+                    RingService.stop(this);
+                    finish();
+                    return true;
+                }
+                downY = -1;
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                downY = -1;
+                break;
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
     private int dp(int v) { return Math.round(getResources().getDisplayMetrics().density * v); }
