@@ -1,4 +1,3 @@
-
 (function () {
   const $ = id => document.getElementById(id);
   const overlay = $('ringOverlay');
@@ -44,26 +43,24 @@
   arrow.textContent = '↑';
   overlay.insertBefore(arrow, overlay.querySelector('.ring-actions'));
   $('ringSnooze').innerHTML = 'Отложить<br><small>на 5 мин</small>';
-  
 
-  
   let W = 0, H = 0, raf = 0, t0 = 0, sh = null;
   let seed = 7;
   const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
   const P = [];
-  for (let i = 0; i < 260; i++) {
+  for (let i = 0; i < 340; i++) {
     const p = { center: false };
     const z = rnd();
     if (z < 0.62) {
-      p.fx = rnd() < 0.5 ? rnd() * 0.20 : 0.80 + rnd() * 0.20;
+      p.fx = rnd() < 0.5 ? rnd() * 0.16 : 0.84 + rnd() * 0.16;
       p.fy = rnd();
     } else if (z < 0.82) {
       p.fx = rnd();
-      p.fy = rnd() < 0.5 ? rnd() * 0.16 : 0.84 + rnd() * 0.16;
+      p.fy = rnd() < 0.5 ? rnd() * 0.12 : 0.88 + rnd() * 0.12;
     } else {
-      p.fx = 0.2 + rnd() * 0.6; p.fy = 0.2 + rnd() * 0.6; p.center = true;
+      p.fx = 0.16 + rnd() * 0.68; p.fy = 0.12 + rnd() * 0.76; p.center = true;
     }
-    p.r = 0.6 + rnd() * 1.6;
+    p.r = 0.4 + rnd() * 1.1;
     p.a = 0.25 + rnd() * 0.75;
     p.sp = 0.25 + rnd() * 0.5;
     p.sp2 = 0.2 + rnd() * 0.45;
@@ -83,22 +80,22 @@
       gr.addColorStop(1, 'rgba(185,194,216,0)');
       return gr;
     };
-    sh = { l: g(0, 0, W * 0.30, 0), r: g(W, 0, W * 0.70, 0), t: g(0, 0, 0, H * 0.22), b: g(0, H, 0, H * 0.78) };
+    sh = { l: g(0, 0, W * 0.16, 0), r: g(W, 0, W * 0.84, 0), t: g(0, 0, 0, H * 0.12), b: g(0, H, 0, H * 0.88) };
   }
   function frame(now) {
     raf = requestAnimationFrame(frame);
     const t = (now - t0) / 1000;
     ctx.clearRect(0, 0, W, H);
     const pulse = 0.72 + 0.16 * Math.sin(t * 0.7) + 0.12 * Math.sin(t * 1.31 + 1.7);
-    ctx.globalAlpha = Math.max(0, Math.min(1, 0.62 * pulse));
-    ctx.fillStyle = sh.l; ctx.fillRect(0, 0, W * 0.30, H);
-    ctx.fillStyle = sh.r; ctx.fillRect(W * 0.70, 0, W * 0.30, H);
-    ctx.fillStyle = sh.t; ctx.fillRect(0, 0, W, H * 0.22);
-    ctx.fillStyle = sh.b; ctx.fillRect(0, H * 0.78, W, H * 0.22);
+    ctx.globalAlpha = Math.max(0, Math.min(1, 0.5 * pulse));
+    ctx.fillStyle = sh.l; ctx.fillRect(0, 0, W * 0.16, H);
+    ctx.fillStyle = sh.r; ctx.fillRect(W * 0.84, 0, W * 0.16, H);
+    ctx.fillStyle = sh.t; ctx.fillRect(0, 0, W, H * 0.12);
+    ctx.fillStyle = sh.b; ctx.fillRect(0, H * 0.88, W, H * 0.12);
     ctx.fillStyle = '#E6F4EE';
     for (const p of P) {
-      const x = p.fx * W + Math.sin(t * p.sp + p.ph) * 6;
-      const y = p.fy * H + Math.cos(t * p.sp2 + p.ph2) * 5;
+      const x = p.fx * W + Math.sin(t * p.sp + p.ph) * 4;
+      const y = p.fy * H + Math.cos(t * p.sp2 + p.ph2) * 3.5;
       const tw = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * p.tw + p.ph3));
       ctx.globalAlpha = Math.max(0, Math.min(1, p.a * tw * (p.center ? 0.45 : 1)));
       ctx.beginPath(); ctx.arc(x, y, p.r, 0, 6.2832); ctx.fill();
@@ -111,7 +108,6 @@
   };
   window.addEventListener('resize', () => { if (raf) resize(); });
 
-  
   let enteredFs = false;
   function tryFs() {
     try {
@@ -141,7 +137,6 @@
   const origHide = UI.hideRing.bind(UI);
   UI.hideRing = function () { origHide(); fx.stop(); exitFs(); };
 
-  
   let sy = null, sx = 0, onBtn = false;
   overlay.addEventListener('pointerdown', e => {
     sy = e.clientY; sx = e.clientX;
