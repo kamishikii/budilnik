@@ -1,5 +1,4 @@
 
-// Точка входа: связывает кнопки и запускает главный цикл проверки времени.
 (function () {
   const $ = id => document.getElementById(id);
 
@@ -9,14 +8,14 @@
   UI.applyTheme(Store.getTheme() || 'sage');
   UI.renderList();
 
-  // --- нижние плюсики ---
+  
   $('addSingleBtn').onclick = () => UI.openEditor({ mode: 'single' });
   $('addMultiBtn').onclick = () => UI.showBatch();
   $('batchOk').onclick = () => UI.batchConfirm();
   $('batchCancel').onclick = () => UI.hideBatch();
   $('batchInput').addEventListener('keydown', e => { if (e.key === 'Enter') UI.batchConfirm(); });
 
-  // --- меню ---
+  
   function toggleDrawer() {
     if ($('drawer').classList.contains('open')) UI.closeDrawer();
     else { UI.hideRepeatMenu(); UI.openDrawer(); }
@@ -30,7 +29,7 @@
     if (b) UI.applyTheme(b.dataset.themeId);
   });
 
-  // --- редактор ---
+  
   $('edSave').onclick = () => UI.saveEditor();
   $('edCancel').onclick = () => UI.closeEditor();
   $('edRepeatBtn').onclick = e => {
@@ -60,7 +59,7 @@
   };
   $('melodyClear').onclick = () => UI.clearMelody();
 
-  // --- календарь ---
+  
   $('calGrid').addEventListener('click', e => {
     const b = e.target.closest('.cal-day[data-key]');
     if (!b) return;
@@ -76,11 +75,11 @@
   $('calDone').onclick = () => UI.calDone();
   $('calCancel').onclick = () => UI.calCancel();
 
-  // --- экран звонка ---
+  
   $('ringStop').onclick = () => Player.dismiss();
   $('ringSnooze').onclick = () => Player.snooze(5);
 
-  // --- карточки (делегирование событий) ---
+  
   const list = $('alarmList');
   list.addEventListener('click', e => {
     const btn = e.target.closest('[data-action]');
@@ -107,7 +106,7 @@
     }
   });
 
-  // --- звук разрешается после первого касания + держим экран включённым ---
+  
   let wakeLock = null;
   async function requestWake() {
     try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }
@@ -118,14 +117,14 @@
     if (document.visibilityState === 'visible') requestWake();
   });
 
-  // --- главный цикл: каждую секунду проверяем, не пора ли звонить ---
+  
   function tick() {
     const now = new Date();
     const hhmm = Schedule.pad(now.getHours()) + ':' + Schedule.pad(now.getMinutes());
     const dayKey = Schedule.key(now);
     Store.alarms.forEach(a => {
       if (!a.enabled) return;
-      // отложенный будильник
+      
       if (a.snoozeUntil) {
         if (Date.now() >= a.snoozeUntil) {
           Store.update(a.id, { snoozeUntil: null });
