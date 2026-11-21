@@ -1,7 +1,7 @@
-// Отрисовка: карточки, редактор, календарь, меню, экран звонка.
+
 const UI = {
-  ed: null,   // состояние редактора
-  cal: null,  // состояние календаря
+  ed: null,   
+  cal: null,  
 
   $(id) { return document.getElementById(id); },
   esc(s) {
@@ -16,7 +16,7 @@ const UI = {
     this._toastT = setTimeout(() => t.classList.add('hidden'), 2500);
   },
 
-  // ===== список будильников =====
+
   renderList() {
     const arr = [...Store.alarms].sort((a, b) => a.time.localeCompare(b.time));
     this.$('alarmList').innerHTML = arr.map(a => this.cardHTML(a)).join('');
@@ -46,7 +46,7 @@ const UI = {
       </div>${dates}</div>`;
   },
 
-  // ===== редактор =====
+  
   openEditor(opts) {
     Player.stopPreview(); this.setPreviewIcon(false);
     const ed = {
@@ -90,7 +90,7 @@ const UI = {
     this.$('editorOverlay').classList.add('hidden');
     this.hideRepeatMenu();
     this.ed = null;
-    Store.cleanupMelodies(); // если мелодию выбрали, но отменили — убираем её из хранилища
+    Store.cleanupMelodies(); 
   },
   saveEditor() {
     const ed = this.ed;
@@ -149,7 +149,7 @@ const UI = {
     return { ok, bad };
   },
 
-  // ===== выпадающий список графиков =====
+  
   showRepeatMenu() {
     const menu = this.$('repeatMenu');
     menu.innerHTML = Schedule.TYPES.map(t =>
@@ -175,7 +175,7 @@ const UI = {
     this.hideRepeatMenu();
   },
 
-  // ===== мелодия =====
+  
   async onMelodyFile(file) {
     if (!file || !this.ed) return;
     if (file.size > 20 * 1024 * 1024) { this.toast('Файл слишком большой (до 20 МБ)'); return; }
@@ -195,7 +195,7 @@ const UI = {
   },
   setPreviewIcon(playing) { this.$('melodyPreview').textContent = playing ? '⏸' : '▶'; },
 
-  // ===== календарь своих дат =====
+  
   openCalendar(dates) {
     const now = new Date();
     this.cal = { y: now.getFullYear(), m: now.getMonth(), sel: new Set(dates || []) };
@@ -235,7 +235,7 @@ const UI = {
   },
   calCancel() { this.$('calOverlay').classList.add('hidden'); },
 
-  // ===== боковое меню и темы =====
+  
   openDrawer() {
     this.$('drawer').classList.add('open');
     this.$('drawerOverlay').classList.remove('hidden');
@@ -254,7 +254,7 @@ const UI = {
       b.classList.toggle('active', b.dataset.themeId === id));
   },
 
-  // ===== экран звонка =====
+  
   showRing(a) {
     this.$('ringTime').textContent = a.time;
     this.$('ringNote').textContent = a.note || '';
@@ -262,7 +262,7 @@ const UI = {
   },
   hideRing() { this.$('ringOverlay').classList.add('hidden'); },
 
-  // ===== массовое добавление =====
+  
   showBatch() {
     this.$('batchBar').classList.remove('hidden');
     this.$('batchInput').value = '';
